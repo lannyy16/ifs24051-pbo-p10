@@ -6,6 +6,7 @@ import org.delcom.app.entities.User;       // IMPORT User
 import org.delcom.app.entities.CashFlow;
 import org.delcom.app.services.CashFlowService;
 import org.delcom.app.types.EType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -20,6 +21,7 @@ public class CashFlowController {
     private final CashFlowService cashFlowService;
     private final AuthContext authContext; // INJEKSI AuthContext
 
+    @Autowired
     public CashFlowController(CashFlowService cashFlowService, AuthContext authContext) {
         this.cashFlowService = cashFlowService;
         this.authContext = authContext; // Inisialisasi AuthContext

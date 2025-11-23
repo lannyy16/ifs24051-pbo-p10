@@ -2,6 +2,7 @@ package org.delcom.app.services;
 
 import org.delcom.app.entities.CashFlow;
 import org.delcom.app.repositories.CashFlowRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public class CashFlowService {
 
     private final CashFlowRepository cashFlowRepository;
 
+    @Autowired
     public CashFlowService(CashFlowRepository cashFlowRepository) {
         this.cashFlowRepository = cashFlowRepository;
     }
