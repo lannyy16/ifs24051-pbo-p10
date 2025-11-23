@@ -1,0 +1,121 @@
+@BaseUrl = http://localhost:8080/api
+@email = cashflow-user@delcom.org
+@password = test123456
+
+## ---------------------------------
+## Authentication
+## ---------------------------------
+
+# @name PostRegister
+# Registrasi pengguna baru untuk cash flow
+POST {{BaseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Cash Flow User",
+    "email": "{{email}}",
+    "password": "{{password}}"
+}
+
+###
+
+# @name PostLogin
+# Login untuk mendapatkan token
+POST {{BaseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "{{email}}",
+    "password": "{{password}}"
+}
+
+###
+
+@bearerToken = Bearer {{PostLogin.response.body.data.authToken}}
+
+## ---------------------------------
+## Cash Flows
+## ---------------------------------
+
+# @name PostCreateIncome
+# Menambahkan data pemasukan baru
+POST {{BaseUrl}}/cash-flows
+Authorization: {{bearerToken}}
+Content-Type: application/json
+
+{
+    "type": "PEMASUKAN",
+    "source": "Gaji",
+    "label": "Gaji Bulanan",
+    "amount": 5000000,
+    "description": "Gaji dari perusahaan"
+}
+
+###
+
+@incomeId = {{PostCreateIncome.response.body.data.id}}
+
+# @name PostCreateExpense
+# Menambahkan data pengeluaran baru
+POST {{BaseUrl}}/cash-flows
+Authorization: {{bearerToken}}
+Content-Type: application/json
+
+{
+    "type": "PENGELUARAN",
+    "source": "Dompet",
+    "label": "Makan Siang",
+    "amount": 25000,
+    "description": "Makan di warteg"
+}
+
+###
+
+# @name GetAllCashFlows
+# Mengambil semua data cash flow milik pengguna yang login
+GET {{BaseUrl}}/cash-flows
+Authorization: {{bearerToken}}
+
+###
+
+# @name SearchCashFlows
+# Mencari data cash flow dengan kata kunci "gaji"
+GET {{BaseUrl}}/cash-flows?search=gaji
+Authorization: {{bearerToken}}
+
+###
+
+# @name GetCashFlowLabels
+# Mengambil semua label unik milik pengguna
+GET {{BaseUrl}}/cash-flows/labels
+Authorization: {{bearerToken}}
+
+###
+
+# @name GetCashFlowById
+# Mengambil satu data cash flow (pemasukan) berdasarkan ID
+GET {{BaseUrl}}/cash-flows/{{incomeId}}
+Authorization: {{bearerToken}}
+
+###
+
+# @name PutUpdateCashFlow
+# Memperbarui data cash flow (pemasukan)
+PUT {{BaseUrl}}/cash-flows/{{incomeId}}
+Authorization: {{bearerToken}}
+Content-Type: application/json
+
+{
+    "type": "PEMASUKAN",
+    "source": "Gaji",
+    "label": "Gaji Bulanan (Revisi)",
+    "amount": 5500000,
+    "description": "Gaji dari perusahaan setelah bonus"
+}
+
+###
+
+# @name DeleteCashFlow
+# Menghapus data cash flow (pemasukan)
+DELETE {{BaseUrl}}/cash-flows/{{incomeId}}
+Authorization: {{bearerToken}}
