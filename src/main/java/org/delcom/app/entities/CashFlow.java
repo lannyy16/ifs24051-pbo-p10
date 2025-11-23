@@ -1,29 +1,49 @@
 package org.delcom.app.entities;
 
 import jakarta.persistence.*;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "cash_flows")
+@Table(name = "cash_flows") 
 public class CashFlow {
     @Id
-    private UUID id;
-
-    @Column(name = "user_id", nullable = false) // TAMBAHKAN INI
-    private UUID userId;                         // TAMBAHKAN INI
-
-    private String type;
-    private String source;
-    private String label;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
+    private UUID id; 
+    
+    // 👈 FIELD BARU: User ID
+    @Column(name = "user_id", updatable = false, nullable = false, columnDefinition = "uuid")
+    private UUID userId; 
+    
+    @Column(name = "type", nullable = false)
+    private String type; 
+    
+    @Column(name = "source", nullable = false)
+    private String source; 
+    
+    @Column(name = "label", nullable = false)
+    private String label; 
+    
+    @Column(name = "amount", nullable = false)
     private Integer amount;
-    private String description;
-    private Instant createdAt;
-    private Instant updatedAt;
 
-    public CashFlow() {}
+    @Column(name = "description", nullable = false)
+    private String description; 
+    
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
-    public CashFlow(String type, String source, String label, Integer amount, String description) {
+
+    // 1. Constructor Wajib (No-Args)
+    public CashFlow(String pemasukan, String gaji, String deskripsi_updated, int par, String string) {}
+
+    // 2. Constructor yang Diperbarui (Termasuk userId)
+    public CashFlow(UUID userId, String type, String source, String label, Integer amount, String description) {
+        this.userId = userId; // 👈 Inisialisasi userId
         this.type = type;
         this.source = source;
         this.label = label;
@@ -31,25 +51,25 @@ public class CashFlow {
         this.description = description;
     }
 
+    // Lifecycle Callbacks (Sesuai Test TA: onCreate, onUpdate)
     @PrePersist
-    protected void onCreate() {
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
-
     @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = Instant.now();
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
-
-    // Getters dan Setters
+    
+    // ------------------- Getters and Setters -------------------
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
-
-    // TAMBAHKAN GETTER & SETTER UNTUK userId
+    
+    // 👈 Getter dan Setter untuk userId
     public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
-
+    public void setUserId(UUID userId) { this.userId = userId; } 
+    
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
     public String getSource() { return source; }
@@ -57,9 +77,9 @@ public class CashFlow {
     public String getLabel() { return label; }
     public void setLabel(String label) { this.label = label; }
     public Integer getAmount() { return amount; }
-    public void setAmount(Integer amount) { this.amount = amount; }
+    public void setAmount(double amount) { this.amount = (int) amount; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 }
