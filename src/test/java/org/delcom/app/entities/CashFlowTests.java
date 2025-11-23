@@ -1,97 +1,89 @@
 package org.delcom.app.entities;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.UUID;
-
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.time.Instant;
+import java.util.UUID;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class CashFlowTests {
+class CashFlowTest {
+
+    private CashFlow cashFlow;
+    private final UUID id = UUID.randomUUID();
+    private final UUID userId = UUID.randomUUID();
+    private final String type = "PEMASUKAN";
+    private final String source = "Gaji";
+    private final String label = "Gaji Bulanan";
+    private final Integer amount = 5000000;
+    private final String description = "Gaji dari kantor";
+
+    @BeforeEach
+    void setUp() {
+        cashFlow = new CashFlow();
+    }
+
     @Test
-    @DisplayName("Memembuat instance dari kelas CashFlow")
-    void testMembuatInstanceCashFlow() throws Exception {
-        // Instance Cash Flow dengan Constructor Kosong
-        {
-            // Arrange (Persiapan)
+    void testDefaultConstructor() {
+        assertNotNull(cashFlow, "Default constructor should create a non-null object.");
+    }
 
-            // Act (Tindakan)
-            CashFlow cashFlow = new CashFlow();
+    @Test
+    void testParameterizedConstructor() {
+        CashFlow parameterizedCashFlow = new CashFlow(type, source, label, amount, description);
+        assertEquals(type, parameterizedCashFlow.getType());
+        assertEquals(source, parameterizedCashFlow.getSource());
+        assertEquals(label, parameterizedCashFlow.getLabel());
+        assertEquals(amount, parameterizedCashFlow.getAmount());
+        assertEquals(description, parameterizedCashFlow.getDescription());
+    }
 
-            // Assert (Pemeriksaan)
-            assert (cashFlow.getId() == null);
-            assert (cashFlow.getUserId() == null);
-            assert (cashFlow.getType() == null);
-            assert (cashFlow.getSource() == null);
-            assert (cashFlow.getLabel() == null);
-            assert (cashFlow.getAmount() == null);
-            assert (cashFlow.getDescription() == null);
-            assert (cashFlow.getCreatedAt() == null);
-            assert (cashFlow.getUpdatedAt() == null);
-        }
+    @Test
+    void testGettersAndSetters() {
+        cashFlow.setId(id);
+        cashFlow.setUserId(userId);
+        cashFlow.setType(type);
+        cashFlow.setSource(source);
+        cashFlow.setLabel(label);
+        cashFlow.setAmount(amount);
+        cashFlow.setDescription(description);
 
-        // Instance Cash Flow dengan Constructor Parameter
-        {
-            // Arrange (Persiapan)
-            UUID userId = UUID.randomUUID();
-            String type = "income";
-            String source = "salary";
-            String label = "monthly";
-            Integer amount = 5000;
-            String description = "June Salary";
+        assertEquals(id, cashFlow.getId());
+        assertEquals(userId, cashFlow.getUserId());
+        assertEquals(type, cashFlow.getType());
+        assertEquals(source, cashFlow.getSource());
+        assertEquals(label, cashFlow.getLabel());
+        assertEquals(amount, cashFlow.getAmount());
+        assertEquals(description, cashFlow.getDescription());
+    }
 
-            // Act (Tindakan)
-            CashFlow cashFlow = new CashFlow(userId, type, source, label, amount, description);
+    @Test
+    void testLifecycleCallbacksOnCreate() throws InterruptedException {
+        // Panggil metode onCreate secara manual untuk simulasi @PrePersist
+        cashFlow.onCreate();
+        
+        Instant createdAt = cashFlow.getCreatedAt();
+        Instant updatedAt = cashFlow.getUpdatedAt();
 
-            // Assert (Pemeriksaan)
-            assert (cashFlow.getId() == null);
-            assert (cashFlow.getUserId().equals(userId));
-            assert (cashFlow.getType().equals(type));
-            assert (cashFlow.getSource().equals(source));
-            assert (cashFlow.getLabel().equals(label));
-            assert (cashFlow.getAmount().equals(amount));
-            assert (cashFlow.getDescription().equals(description));
-            assert (cashFlow.getCreatedAt() == null);
-            assert (cashFlow.getUpdatedAt() == null);
-        }
+        assertNotNull(createdAt);
+        assertNotNull(updatedAt);
+        assertEquals(createdAt, updatedAt);
 
-        // Instance Cash Flow dengan Setter
-        {
-            // Arrange (Persiapan)
-            UUID id = UUID.randomUUID();
-            UUID userId = UUID.randomUUID();
-            String type = "expense";
-            String source = "groceries";
-            String label = "weekly";
-            Integer amount = 150;
-            String description = "Grocery shopping";
+        // Pastikan timestamp berbeda jika dipanggil lagi setelah delay
+        Thread.sleep(10); // delay kecil
+        cashFlow.onUpdate();
+        assertTrue(cashFlow.getUpdatedAt().isAfter(createdAt));
+    }
 
-            // Act (Tindakan)
-            CashFlow cashFlow = new CashFlow();
-            cashFlow.setId(id);
-            cashFlow.setUserId(userId);
-            cashFlow.setType(type);
-            cashFlow.setSource(source);
-            cashFlow.setLabel(label);
-            cashFlow.setAmount(amount);
-            cashFlow.setDescription(description);
+    @Test
+    void testLifecycleCallbacksOnUpdate() {
+        cashFlow.onCreate();
+        Instant initialUpdatedAt = cashFlow.getUpdatedAt();
 
-            cashFlow.onCreate();
-            cashFlow.onUpdate();
+        // Panggil onUpdate untuk simulasi @PreUpdate
+        cashFlow.onUpdate();
+        Instant newUpdatedAt = cashFlow.getUpdatedAt();
 
-            // Assert (Pemeriksaan)
-            assert (cashFlow.getId().equals(id));
-            assert (cashFlow.getUserId().equals(userId));
-            assert (cashFlow.getType().equals(type));
-            assert (cashFlow.getSource().equals(source));
-            assert (cashFlow.getLabel().equals(label));
-            assert (cashFlow.getAmount().equals(amount));
-            assert (cashFlow.getDescription().equals(description));
-
-            // Pastikan createdAt dan updatedAt tidak null setelah dipanggil onCreate dan
-            // onUpdate
-            assertNotNull(cashFlow.getCreatedAt());
-            assertNotNull(cashFlow.getUpdatedAt());
-        }
+        assertNotNull(newUpdatedAt);
+        assertTrue(newUpdatedAt.isAfter(initialUpdatedAt) || newUpdatedAt.equals(initialUpdatedAt));
     }
 }

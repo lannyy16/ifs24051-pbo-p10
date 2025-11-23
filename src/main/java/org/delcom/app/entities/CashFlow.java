@@ -1,55 +1,29 @@
 package org.delcom.app.entities;
 
 import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 @Entity
-@JsonPropertyOrder({
-    "user_id", "id", "type", "source", "label", "amount", 
-    "description", "createdAt", "updatedAt"
-})
-@Table(name = "CashFlow")
+@Table(name = "cash_flows")
 public class CashFlow {
-
     @Id
-    @GeneratedValue(generator = "UUID")
-    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
     private UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @Column(name = "user_id", nullable = false) // TAMBAHKAN INI
+    private UUID userId;                         // TAMBAHKAN INI
 
-    @Column(name = "type", nullable = false)
     private String type;
-    
-    @Column(name = "source", nullable = false)
     private String source;
-
-    @Column(name = "label", nullable = false)
     private String label;
-    
-    @Column(name = "amount", nullable = false)
     private Integer amount;
-
-    @Column(name = "description", nullable = true, columnDefinition = "TEXT")
     private String description;
+    private Instant createdAt;
+    private Instant updatedAt;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    public CashFlow() {}
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    // Constructor, getter, setter
-    public CashFlow() {
-    }
-
-    public CashFlow(UUID userId, String type, String source, String label, Integer amount, String description) {
-        this.userId = userId;
+    public CashFlow(String type, String source, String label, Integer amount, String description) {
         this.type = type;
         this.source = source;
         this.label = label;
@@ -57,88 +31,35 @@ public class CashFlow {
         this.description = description;
     }
 
-    public CashFlow(String var1, String var2, String var3, Integer amount, String var5) {
-        this.type = var1;
-        this.source = var2;
-        this.label = var3;
-        this.amount = amount;
-        this.description = var5;
-    }
-
-    // Getter & Setter
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Integer amount) {
-        this.amount = amount;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    // ======= @PrePersist & @PreUpdate =======
     @PrePersist
-    public void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    protected void onUpdate() {
+        this.updatedAt = Instant.now();
     }
+
+    // Getters dan Setters
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+
+    // TAMBAHKAN GETTER & SETTER UNTUK userId
+    public UUID getUserId() { return userId; }
+    public void setUserId(UUID userId) { this.userId = userId; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
+    public String getLabel() { return label; }
+    public void setLabel(String label) { this.label = label; }
+    public Integer getAmount() { return amount; }
+    public void setAmount(Integer amount) { this.amount = amount; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public Instant getCreatedAt() { return createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
 }

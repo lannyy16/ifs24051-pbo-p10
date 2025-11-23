@@ -1,27 +1,32 @@
 package org.delcom.app.repositories;
 
+import org.delcom.app.entities.CashFlow;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.delcom.app.entities.CashFlow;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-
-
 @Repository
 public interface CashFlowRepository extends JpaRepository<CashFlow, UUID> {
-    @Query("SELECT c FROM CashFlow c WHERE LOWER(c.type) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(c.source) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
-            "OR LOWER(c.label) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
-            "OR LOWER(c.description) LIKE LOWER(CONCAT('%', :keyword, '%')) AND c.userId = :userId")
-    List<CashFlow> findByKeyword(UUID userId, String keyword);
 
-    @Query("SELECT DISTINCT c.label FROM CashFlow c WHERE c.userId = :userId ORDER BY c.label ")
-    List<String> findDistinctLabels(UUID userId);
+    // Kueri untuk mencari berdasarkan keyword DAN userId
+    @Query("SELECT c FROM CashFlow c WHERE c.userId = :userId AND (lower(c.label) LIKE lower(concat('%', :keyword, '%')) OR lower(c.description) LIKE lower(concat('%', :keyword, '%')))")
+    List<CashFlow> findByUserIdAndKeyword(@Param("userId") UUID userId, @Param("keyword") String keyword);
 
-    @Query("Select c FROM CashFlow c WHERE c.id = :id AND c.userId = :userId")
-    Optional<CashFlow> findByUserIdAndId(UUID userId, UUID id);
+    // Kueri untuk mendapatkan semua data berdasarkan userId
+    List<CashFlow> findByUserId(UUID userId);
+    
+    // Kueri untuk mendapatkan label unik berdasarkan userId
+    @Query("SELECT DISTINCT c.label FROM CashFlow c WHERE c.userId = :userId")
+    List<String> findDistinctLabelsByUserId(@Param("userId") UUID userId);
+
+    // Kueri untuk mencari data berdasarkan ID DAN userId
+    Optional<CashFlow> findByIdAndUserId(UUID id, UUID userId);
+
+    // Kueri untuk mengecek keberadaan data berdasarkan ID DAN userId
+    boolean existsByIdAndUserId(UUID id, UUID userId);
 }
-
